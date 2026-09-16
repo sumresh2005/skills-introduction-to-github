@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Friend CRM</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>Friend CRM</h1>
+    <div class="import-actions">
+      <input id="fbFeedUrl" type="text" placeholder="Facebook birthdays webcal:// URL" />
+      <button id="importFacebookBtn">Import Facebook birthdays</button>
+      <a id="connectGoogleLink" href="/auth/google/start"><button type="button">Connect Google</button></a>
+      <button id="importGoogleBtn">Import Google contacts</button>
+    </div>
+  </header>
+
+  <main>
+    <section id="upcoming" class="panel">
+      <h2>Upcoming birthdays</h2>
+      <ul id="upcomingList" class="upcoming-list"></ul>
+    </section>
+
+    <section class="panel">
+      <div class="tier-tabs">
+        <button class="tier-tab active" data-tier="">All</button>
+        <button class="tier-tab" data-tier="primary">Primary</button>
+        <button class="tier-tab" data-tier="secondary">Secondary</button>
+        <button id="addFriendBtn" class="add-friend">+ Add friend</button>
+      </div>
+      <div id="friendGrid" class="friend-grid"></div>
+    </section>
+  </main>
+
+  <dialog id="friendDialog">
+    <form id="friendForm" method="dialog">
+      <h3 id="friendDialogTitle">Add friend</h3>
+      <input type="hidden" name="id" />
+      <label>Name <input name="name" required /></label>
+      <label>Location <input name="location" /></label>
+      <label>Email <input name="email" type="email" /></label>
+      <label>Phone <input name="phone" /></label>
+      <label>Birthday
+        <div class="dob-inputs">
+          <input name="dobMonth" type="number" min="1" max="12" placeholder="MM" />
+          <input name="dobDay" type="number" min="1" max="31" placeholder="DD" />
+          <input name="dobYear" type="number" placeholder="YYYY (optional)" />
+        </div>
+      </label>
+      <label>Tier
+        <select name="tier">
+          <option value="secondary">Secondary</option>
+          <option value="primary">Primary</option>
+        </select>
+      </label>
+      <label>Tags (comma separated) <input name="tags" /></label>
+      <label>Notes <textarea name="notes" rows="3"></textarea></label>
+      <div class="dialog-actions">
+        <button type="button" id="cancelFriendBtn">Cancel</button>
+        <button type="submit" id="saveFriendBtn">Save</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="messageDialog">
+    <form id="messageForm" method="dialog">
+      <h3>Message <span id="messageFriendName"></span></h3>
+      <label>Channel
+        <select name="channel">
+          <option value="email">Email (opens your mail client)</option>
+          <option value="webhook">Webhook (your own DM automation)</option>
+        </select>
+      </label>
+      <label>Message <textarea name="body" rows="4" required></textarea></label>
+      <div class="dialog-actions">
+        <button type="button" id="cancelMessageBtn">Cancel</button>
+        <button type="submit">Send</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>
