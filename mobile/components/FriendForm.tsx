@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   dobRow: { flexDirection: 'row', gap: 8 },
-  dobInput: { flex: 1, textAlign: 'center' },
+  dobInput: { flex: 1, minWidth: 0, textAlign: 'center' },
   notesInput: { minHeight: 80, textAlignVertical: 'top' },
   tierRow: { flexDirection: 'row', gap: 8 },
   tierOption: {
