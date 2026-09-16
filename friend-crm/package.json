@@ -1,0 +1,17 @@
+{
+  "name": "friend-crm",
+  "version": "1.0.0",
+  "description": "A private, consent-based friend directory with birthday reminders and outgoing-message logging.",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test test/"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
