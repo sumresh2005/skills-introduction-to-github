@@ -39,23 +39,79 @@ review" in the UI.
 ## Google Contacts import: needs a development build
 
 Google's OAuth redirect for a native app needs a stable custom URL scheme
-(`friendcrm://`) that's registered as part of the app's own bundle
-identifier — Expo Go can't do this because it runs every project under its
-own shared bundle ID, and Expo's older hosted auth-proxy workaround for
-this no longer exists in this SDK. To use this feature:
+tied to the app's real package name/bundle ID and signing key — Expo Go
+can't do this because every project runs under Expo Go's own shared
+identity, and Expo's older hosted auth-proxy workaround for this no longer
+exists in this SDK. None of the steps below can be done from an
+environment without your own Google/Expo accounts, so this is written for
+you to run yourself (Android first — it's the simpler path: no paid
+developer account, no Mac needed).
 
-1. `npx expo prebuild` (or use `eas build --profile development`) to
-   produce a development build with your own bundle identifier.
-2. In [Google Cloud Console](https://console.cloud.google.com), enable the
-   **People API** and create an OAuth client of type **iOS** and/or
-   **Android**, using the same bundle identifier / package name as this
-   app (see `app.json` → `ios.bundleIdentifier` / `android.package`;
-   change these from the `com.example.friendcrm` placeholder to your own
-   before building).
-3. Put the resulting client ID(s) into `app.json` → `expo.extra`:
-   `googleIosClientId`, `googleAndroidClientId`.
-4. Rebuild the development build and run the "Sign in & import Google
-   contacts" button from there (not from Expo Go).
+**1. Get an Expo account and the EAS CLI** (skip if you already have both):
+
+```bash
+npm install -g eas-cli
+eas login          # free account at expo.dev if you don't have one
+```
+
+**2. From `mobile/`, let EAS create/manage the Android signing keystore**
+and print its SHA-1 fingerprint — you need this before Google will issue a
+client ID:
+
+```bash
+eas credentials
+# Select: Android -> your project -> Keystore -> Set Up a New Keystore
+# (or "Use existing" if you already have one), then view its details.
+# Copy the "SHA1 Fingerprint" value shown.
+```
+
+**3. In [Google Cloud Console](https://console.cloud.google.com):**
+
+- Create or select a project, then enable the **People API**
+  (APIs & Services → Library → search "People API" → Enable).
+- Configure the **OAuth consent screen** (External is fine for testing —
+  add your own Google account under "Test users" so you can sign in
+  without publishing the app for review).
+- **Credentials → Create Credentials → OAuth client ID → Android.**
+  - Package name: whatever's in `app.json` → `expo.android.package`
+    (`com.example.friendcrm` by default — fine for testing; change it to
+    something you own before a real store submission).
+  - SHA-1 certificate fingerprint: paste the value from step 2.
+- Copy the resulting **Client ID**.
+
+**4. Wire the client ID into the app** — edit `app.json`:
+
+```json
+"extra": {
+  "googleAndroidClientId": "PASTE_YOUR_CLIENT_ID_HERE.apps.googleusercontent.com"
+}
+```
+
+**5. Build and install the development build:**
+
+```bash
+eas build --profile development --platform android
+```
+
+This builds in Expo's cloud (a few minutes) and gives you a link/QR code
+to download and install the `.apk` directly on your Android phone —
+no Play Store step needed for this.
+
+**6. Run against it:**
+
+```bash
+npx expo start --dev-client
+```
+
+Open the installed dev-build app (not Expo Go) on your phone, scan the QR
+code, and the "Sign in & import Google contacts" button on the Import
+screen will now complete the OAuth flow correctly.
+
+**iOS** follows the same shape (`eas credentials` → iOS → get the bundle
+ID, `eas build --profile development --platform ios --simulator` if you
+have a Mac to run the simulator, or a real device build if you have a paid
+Apple Developer account for provisioning) — ask if you want the exact
+steps once Android is working.
 
 Nothing is persisted from this flow — the access token is used once for
 the import and discarded, so there's no refresh token or credential
